@@ -17,6 +17,8 @@ class Model:
    ], 
   dtype="f"
  )
+ def get_indices(this):
+  return numpy.array(this.indices)
   
  def from_json(data: dict):
   return Model(
