@@ -1,4 +1,5 @@
-from Vertex3D import *
+from Vertex3D import Vertex3D
+import numpy
 
 class Model:
  vertices: list[Vertex3D]
@@ -7,6 +8,15 @@ class Model:
  def __init__(this, vertices: Vertex3D, indices: list[list[int]]):
   this.vertices = vertices
   this.indices = indices
+  
+ def get_vertices(this):
+  return numpy.array(
+   [
+    list(vertex.get_coordinates())
+    for vertex in this.vertices
+   ], 
+  dtype="f"
+ )
   
  def from_json(data: dict):
   return Model(

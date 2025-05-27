@@ -8,6 +8,9 @@ class Vertex3D:
   this.y = y
   this.z = z
   
+ def get_coordinates(this) -> tuple[float, float, float]:
+  return this.x, this.y, this.z
+  
  def from_json(data: dict):
   return Vertex3D(
    data["x"],

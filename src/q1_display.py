@@ -1,11 +1,13 @@
-from core import Model, read_models
+from core import read_models
+from Renderer import Renderer
 
 def main():
  MODELS_PATH = "../res/models.json"
  
- models: dict[str, Model] = read_models(MODELS_PATH)
- 
- print(models)
+ renderer = Renderer(
+  read_models(MODELS_PATH)
+ )
+ renderer.draw("cube")
 
 if __name__ == "__main__":
  main()
