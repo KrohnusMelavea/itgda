@@ -7,12 +7,9 @@ layout (binding = 0) uniform UBO {
 
 layout (location = 0) in vec3 vertex_position;
 
-layout (location = 1) in vec3 instance_translation;
-layout (location = 2) in vec3 instance_rotation;
-layout (location = 3) in vec3 instance_scale;
-layout (location = 4) in vec3 instance_colour;
-
-out vec3 instance_fragment_colour;
+layout (location = 2) in vec3 instance_translation;
+layout (location = 3) in vec3 instance_rotation;
+layout (location = 4) in vec3 instance_scale;
 
 mat4 translation_matrix(const vec3 v) {
 	return mat4(
@@ -45,7 +42,6 @@ vec4 quaternion_rotate_3d(const vec4 V, const vec3 A) {
 }
 
 void main() {
- instance_fragment_colour = vec3(1, 1, 1);
  gl_Position = 
   camera.projection * 
   camera.view * 
