@@ -1,0 +1,65 @@
+import pygame
+
+class KeyboardState:
+ w: bool
+ a: bool
+ s: bool
+ d: bool
+ space: bool
+ shift: bool
+ l_arrow: bool
+ r_arrow: bool
+ 
+ def __init__(this):
+  state = pygame.key.get_pressed()
+  this.w = state[pygame.K_w]
+  this.a = state[pygame.K_a]
+  this.s = state[pygame.K_s]
+  this.d = state[pygame.K_d]
+  this.space = state[pygame.K_SPACE]
+  this.shift = state[pygame.K_LSHIFT] or state[pygame.K_RSHIFT]
+  this.l_arrow = state[pygame.K_LEFT]
+  this.r_arrow = state[pygame.K_RIGHT]
+ 
+ def update(this, event_type: int, event_key: int):
+  match event_type:
+   case pygame.KEYUP:
+    match event_key:
+     case pygame.K_w:
+      this.w = False
+     case pygame.K_a:
+      this.a = False
+     case pygame.K_s:
+      this.s = False
+     case pygame.K_d:
+      this.d = False
+     case pygame.K_SPACE:
+      this.space = False
+     case pygame.K_LSHIFT:
+      this.shift = False
+     case pygame.K_RSHIFT:
+      this.shift = False
+     case pygame.K_LEFT:
+      this.l_arrow = False
+     case pygame.K_RIGHT:
+      this.r_arrow = False
+   case pygame.KEYDOWN:
+    match event_key:
+     case pygame.K_w:
+      this.w = True
+     case pygame.K_a:
+      this.a = True
+     case pygame.K_s:
+      this.s = True
+     case pygame.K_d:
+      this.d = True
+     case pygame.K_SPACE:
+      this.space = True
+     case pygame.K_LSHIFT:
+      this.shift = True
+     case pygame.K_RSHIFT:
+      this.shift = True
+     case pygame.K_LEFT:
+      this.l_arrow = True
+     case pygame.K_RIGHT:
+      this.r_arrow = True

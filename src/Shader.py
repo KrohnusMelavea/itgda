@@ -8,11 +8,15 @@ from OpenGL.GL import (
 class Shader:
  path: str
  source: str
- binary: str
+ binary: int
  
  def __init__(this, file_path: str):
   this.path = file_path
   this.source = read_file(this.path)
+  this.binary = shaders.compileShader(
+   this.source, 
+   Shader.get_shader_type_from_file_path(this.path)
+  )
 
  def reload_from_file(this):
   source: str = read_file(this.path)
