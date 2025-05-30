@@ -19,6 +19,34 @@ To install dependencies, run "python -m pip install --upgrade <dependency_name>"
 
 # CONTROLS:
 - Translation:
- - X:
-- - - +: W
+  - X: 
+    - +: w
+    - -: s
+  - Y:
+    - +: d
+    - -: a
+  - Z:
+    - +: space
+    - -: shift
+- Rotation:
+  - X:
+    - +: down arrow
+    - -: up arrow
+  - Y:
+    - +: left arrow
+    - -: right arrow
+  - Z:
+    - +: q
+    - -: e
+- Scale:
+  - X:
+    - +: 
+    - -: 
+  - Y:
+    - +:
+    - -:
+  - Z:
+    - +:
+    - -:
+Note: Translation is not relative to (0, 1, 0), but to the current rotation.
 
