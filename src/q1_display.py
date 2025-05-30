@@ -6,6 +6,7 @@ from Vertex3D import Vertex3D
 from Camera import Camera
 from KeyboardState import KeyboardState
 import pygame
+import time
 import math
 
 def main():
@@ -14,7 +15,7 @@ def main():
  pygame.init()
  screen_width = pygame.display.Info().current_w
  screen_height = pygame.display.Info().current_h
- window = pygame.display.set_mode((screen_width, screen_height), pygame.FULLSCREEN | pygame.OPENGL | pygame.DOUBLEBUF)
+ window = pygame.display.set_mode((800, 600), pygame.OPENGL | pygame.DOUBLEBUF)
  
  renderer = Renderer(
   read_models(MODELS_PATH),
@@ -69,9 +70,13 @@ def main():
    camera.position.y -= movement_speed
    
   renderer.draw(camera)
+
+  renderer.drawText(0, 0, "[ESC] to Quit")
   
-  window.blit(font.render("[ESC] to Quit", 1, (255, 255, 255)), (0, 0))
+  #window.blit(font.render("[ESC] to Quit", 1, (255, 255, 255)), (0, 0))
   pygame.display.flip()
+
+  time.sleep(0.01)
   
  pygame.display.quit()
  pygame.quit()

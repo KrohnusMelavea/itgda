@@ -77,7 +77,7 @@ class Renderer:
     camera.position.z + math.sin(camera.rotation.y)
    ), 
    (0, 1, 0), dtype='f')
-  camera_projection = pyrr.matrix44.create_perspective_projection(75.0, 1920 / 1080, 0.1, 75.0, dtype='f')
+  camera_projection = pyrr.matrix44.create_perspective_projection(75.0, 800 / 600, 0.1, 75.0, dtype='f')
   camera_data = numpy.concatenate((camera_view, camera_projection))
   glNamedBufferData(this.camera_uniform_buffer, camera_data.nbytes, camera_data, GL_DYNAMIC_DRAW)
   
@@ -90,12 +90,18 @@ class Renderer:
   
   for model_name in mapped_entities:
    this.draw_entities(model_name, mapped_entities[model_name])
-  
+
+ def drawText(this, x, y, text):
+  font = pygame.font.SysFont("couriernew", 20)                                                
+  textSurface = font.render(text, True, (255, 255, 255), (0, 66, 0, 255))
+  textData = pygame.image.tostring(textSurface, "RGBA", True)
+  glWindowPos2d(x, y)
+  glDrawPixels(textSurface.get_width(), textSurface.get_height(), GL_RGBA, GL_UNSIGNED_BYTE, textData)
+
  def draw_entities(this, model_name: str, entities: list[Entity]):
   transformation_data = numpy.array([[0, 0, -5] + [0, 0, 0] + [0, 0, 0] for entity in entities], dtype='f')
   transformation_buffer = vbo.VBO(data=transformation_data, usage=GL_DYNAMIC_DRAW, target=GL_ARRAY_BUFFER)
-
-#GL_DYNAMIC_STORAGE_BIT
+  #GL_DYNAMIC_STORAGE_BIT
   # colours_data = numpy.array(this.models[model_name].get_colours(), dtype='f')
   # glNamedBuferData(this.colours_buffer, colour_data.nbytes, colour_data, GL_DYNAMIC_STORAGE_BIT)
   
@@ -108,7 +114,7 @@ class Renderer:
   glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 36, ctypes.c_void_p(0))
   glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 36, ctypes.c_void_p(12))
   glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 36, ctypes.c_void_p(24))
-  #glVertexAttribDivisor(1, 1)
+  glVertexAttribDivisor(1, 1)
   
   glDrawElementsInstanced(GL_TRIANGLES, 12*6, GL_UNSIGNED_INT, this.models[model_name].index_buffer, len(entities))
-  
+ 
