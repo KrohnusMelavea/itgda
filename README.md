@@ -17,3 +17,8 @@ To install dependencies, run "python -m pip install --upgrade <dependency_name>"
 - Navigate to the src directory
 - run "python q1_display.py" (prepending "python" may be important on systems with multiple installed versions, as there may be a discrepancy between the path to which the "python" command maps to, and the path of the default program used to execute ".py" files)
 
+# CONTROLS:
+- Translation:
+- - X:
+- - - +: W
+

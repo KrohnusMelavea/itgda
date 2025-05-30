@@ -68,7 +68,6 @@ class Renderer:
    this.colours_offsets[model_name] = colour_offset
    colour_offset += len(model.colours)
   colours_data = numpy.concatenate([this.models[model].get_colours() for model in this.models])
-  #colours_data = this.models["cube"].get_colours()
   this.colours_buffer = glGenBuffers(1)
   glBindBuffer(GL_SHADER_STORAGE_BUFFER, this.colours_buffer)
   glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, this.colours_buffer)
@@ -82,12 +81,6 @@ class Renderer:
   this.mapped_colours_buffer = (GLfloat * (colours_data.nbytes // 4)).from_address(this.mmapped_colours_buffer)
   ctypes.memmove(this.mapped_colours_buffer, colours_data.ctypes.data, colours_data.nbytes)
   glUnmapNamedBuffer(this.colours_buffer)
-  #glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT)
-
-  # this.fragment_uniform_data_index = glGetUniformBlockIndex(this.shader_sets[this.active_shader_set].program, "UniformData")
-  # print(this.fragment_uniform_data_index)
-  # this.fragment_uniform_data = glGenBuffers(1)
-  # glBindBufferBase(GL_UNIFORM_BUFFER, this.fragment_uniform_data_index, this.fragment_uniform_data)
 
  def destroy(this):
   glDeleteBuffers(this.camera_uniform_buffer)
@@ -95,13 +88,13 @@ class Renderer:
  def draw(this, camera: Camera):
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
 
-  rotation_offset = quaternion_rotate_3d(Vertex3D(0, 0, 0), camera.rotation)
+  rotation_offset = quaternion_rotate_3d(Vertex3D(0, 0, -1), camera.rotation)
   camera_view = pyrr.matrix44.create_look_at(
    camera.position.get_coordinates(), 
    (
-    camera.position.x + math.cos(camera.rotation.y),
-    camera.position.y + 0,
-    camera.position.z + math.sin(camera.rotation.y)
+    camera.position.x + rotation_offset.x,
+    camera.position.y + rotation_offset.y,
+    camera.position.z + rotation_offset.z
    ), 
    (0, 1, 0), dtype='f')
   camera_projection = pyrr.matrix44.create_perspective_projection(75.0, 800 / 600, 0.1, 75.0, dtype='f')
@@ -119,16 +112,6 @@ class Renderer:
    this.draw_entities(model_name, mapped_entities[model_name])
 
  def draw_entities(this, model_name: str, entities: list[Entity]):
-  #glBindBuffer(GL_SHADER_STORAGE_BUFFER, this.colours_buffer)
-  #glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, this.colours_buffer)
-  #colours_data = this.models["cube"].get_colours()
-  #colours_data = this.models["cube"].get_colours()
-  #sglFlushMappedNamedBufferRange(this.colours_buffer, 0, colours_data.nbytes)
-  #glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0)
-
-  #uniform_data = numpy.array([this.colours_offsets[model_name]], dtype=numpy.int32)
-  #glNamedBufferData(this.camera_uniform_buffer, uniform_data.nbytes, uniform_data, GL_DYNAMIC_DRAW)
-  
   glUniform1i(glGetUniformLocation(this.shader_sets[this.active_shader_set].program, "colours_offset"), this.colours_offsets[model_name])
 
   transformation_data = numpy.array([list(entity.translation.get_coordinates()) + list(entity.rotation.get_coordinates()) + list(entity.scale.get_coordinates()) for entity in entities], dtype=numpy.float32)
@@ -151,8 +134,6 @@ class Renderer:
   glVertexAttribDivisor(3, 1)
   
   glDrawElementsInstanced(GL_TRIANGLES, 12*6, GL_UNSIGNED_INT, this.models[model_name].index_buffer, len(entities))
-  
-  glFlush()
 
   this.models[model_name].index_buffer.unbind()
   this.models[model_name].vertex_buffer.unbind()

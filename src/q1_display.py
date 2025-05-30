@@ -1,4 +1,4 @@
-from core import read_models
+from core import read_models, quaternion_rotate_3d
 from ShaderSet import ShaderSet
 from Renderer import Renderer
 from Entity import Entity
@@ -8,6 +8,7 @@ from KeyboardState import KeyboardState
 import pygame
 import time
 import math
+import pyrr
 
 def main():
  MODELS_PATH = "../res/models.json"
@@ -26,15 +27,16 @@ def main():
    ])
   ],
   [
-   Entity(Vertex3D(0, 0, -5), "cube"),
-   Entity(Vertex3D(0, 5, -5), "pyramid")
+   Entity(Vertex3D(0, 0, 0), "cube"),
+   Entity(Vertex3D(0, 5, 0), "pyramid"),
+   Entity(Vertex3D(0, -5, 0), "prism"),
   ]
  )
  
  keyboard_state = KeyboardState()
- camera = Camera(position=Vertex3D(0, 0, 0), rotation = Vertex3D(0, math.pi * 1.5, 0))
- movement_speed = 0.005
- rotation_speed = 0.001
+ camera = Camera(position=Vertex3D(0, 0, 10), rotation = Vertex3D(0, 0, 0))
+ movement_speed = 0.008
+ rotation_speed = 0.002
  
  running = True
  while True:
@@ -47,27 +49,32 @@ def main():
       
   if not running:
    break
-  
-  if keyboard_state.l_arrow:
-   camera.rotation.y -= rotation_speed
+
+  if keyboard_state.u_arrow:
+   camera.rotation.x += rotation_speed
   if keyboard_state.r_arrow:
+   camera.rotation.y -= rotation_speed
+  if keyboard_state.d_arrow:
+   camera.rotation.x -= rotation_speed
+  if keyboard_state.l_arrow:
    camera.rotation.y += rotation_speed
+  if keyboard_state.q:
+   camera.rotation.z += rotation_speed
+  if keyboard_state.e:
+   camera.rotation.z -= rotation_speed
   if keyboard_state.w:
-   camera.position.x += movement_speed * math.cos(camera.rotation.y)
-   camera.position.z += movement_speed * math.sin(camera.rotation.y)
+   camera.position += quaternion_rotate_3d(Vertex3D(0, 0, -movement_speed), camera.rotation)
   if keyboard_state.a:
-   camera.position.x += movement_speed * math.cos(camera.rotation.y + math.pi * 1.5)
-   camera.position.z += movement_speed * math.sin(camera.rotation.y + math.pi * 1.5)
+   camera.position += quaternion_rotate_3d(Vertex3D(-movement_speed, 0, 0), camera.rotation)
   if keyboard_state.s:
-   camera.position.x += movement_speed * math.cos(camera.rotation.y + math.pi)
-   camera.position.z += movement_speed * math.sin(camera.rotation.y + math.pi)
+   camera.position += quaternion_rotate_3d(Vertex3D(0, 0, movement_speed), camera.rotation)
   if keyboard_state.d:
-   camera.position.x += movement_speed * math.cos(camera.rotation.y + math.pi * 0.5)
-   camera.position.z += movement_speed * math.sin(camera.rotation.y + math.pi * 0.5)
+   camera.position += quaternion_rotate_3d(Vertex3D(movement_speed, 0, 0), camera.rotation)
   if keyboard_state.space:
-   camera.position.y += movement_speed
+   camera.position += quaternion_rotate_3d(Vertex3D(0, movement_speed, 0), camera.rotation)
   if keyboard_state.shift:
-   camera.position.y -= movement_speed
+   camera.position += quaternion_rotate_3d(Vertex3D(0, -movement_speed, 0), camera.rotation)
+
    
   renderer.draw(camera)
   pygame.display.flip()
