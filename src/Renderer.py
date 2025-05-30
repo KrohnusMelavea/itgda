@@ -61,8 +61,8 @@ class Renderer:
   this.camera_uniform_buffer = glGenBuffers(1)
   glBindBufferBase(GL_UNIFORM_BUFFER, this.camera_uniform_index, this.camera_uniform_buffer)
 
-  this.colours_buffer = glGenBuffers(1)
-  glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, this.colours_buffer)
+  # this.colours_buffer = glGenBuffers(1)
+  # glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, this.colours_buffer)
 
  
  def draw(this, camera: Camera):
@@ -78,7 +78,7 @@ class Renderer:
    ), 
    (0, 1, 0), dtype='f')
   camera_projection = pyrr.matrix44.create_perspective_projection(75.0, 1920 / 1080, 0.1, 75.0, dtype='f')
-  camera_data = numpy.concatenate((camera_view, camera_projection, this.models[]))
+  camera_data = numpy.concatenate((camera_view, camera_projection))
   glNamedBufferData(this.camera_uniform_buffer, camera_data.nbytes, camera_data, GL_DYNAMIC_DRAW)
   
   mapped_entities: dict[str, list[Entity]] = dict()
@@ -92,23 +92,23 @@ class Renderer:
    this.draw_entities(model_name, mapped_entities[model_name])
   
  def draw_entities(this, model_name: str, entities: list[Entity]):
-  transformation_data = numpy.array([list(entity.position.get_coordinates()) + [0, 0, 0, 10, 10, 10] for entity in entities], dtype='f')
-  transformation_buffer = vbo.VBO(data=transformation_data, usage="GL_DYNAMIC_DRAW", target="GL_ARRAY_BUFFER")
+  transformation_data = numpy.array([[0, 0, -5] + [0, 0, 0] + [0, 0, 0] for entity in entities], dtype='f')
+  transformation_buffer = vbo.VBO(data=transformation_data, usage=GL_DYNAMIC_DRAW, target=GL_ARRAY_BUFFER)
 
-  colours_data = numpy.array(this.models[model_name].get_colours(), dtype='f')
-  glNamedBuferData(this.colours_buffer, colour_data.nbytes, colour_data, GL_DYNAMIC_DRAW)
-
+#GL_DYNAMIC_STORAGE_BIT
+  # colours_data = numpy.array(this.models[model_name].get_colours(), dtype='f')
+  # glNamedBuferData(this.colours_buffer, colour_data.nbytes, colour_data, GL_DYNAMIC_STORAGE_BIT)
+  
   this.models[model_name].index_buffer.bind()
   glEnableVertexAttribArray(0)
   glEnableVertexAttribArray(1)
-  glEnableVertexAttribArray(2)
   this.models[model_name].vertex_buffer.bind()
-  glVertexAttribPointer(0, 3, GL_FLOAT, True, 12, 0)
+  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 12, None)
   transformation_buffer.bind()
-  glVertexAttribPointer(1, 3, GL_FLOAT, True, 36, 0)
-  glVertexAttribPointer(1, 3, GL_FLOAT, True, 36, 12)
-  glVertexAttribPointer(1, 3, GL_FLOAT, True, 36, 24)
-  glVertexAttribDivisor(1, 1)
+  glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 36, ctypes.c_void_p(0))
+  glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 36, ctypes.c_void_p(12))
+  glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 36, ctypes.c_void_p(24))
+  #glVertexAttribDivisor(1, 1)
   
   glDrawElementsInstanced(GL_TRIANGLES, 12*6, GL_UNSIGNED_INT, this.models[model_name].index_buffer, len(entities))
   
