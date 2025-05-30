@@ -1,9 +1,13 @@
-#version 420 core
+#version 430
 
 layout (binding = 0) uniform UBO {
  mat4 view;
  mat4 projection;
 } camera;
+
+//layout (binding = 1) buffer PrimitiveData {
+// vec4 colours[];
+//} primitive_data;
 
 layout (location = 0) in vec3 vertex_position;
 

@@ -26,7 +26,8 @@ def main():
    ])
   ],
   [
-   Entity(Vertex3D(0, 0, -5), "cube")
+   Entity(Vertex3D(0, 0, -5), "cube"),
+   Entity(Vertex3D(0, 5, -5), "pyramid")
   ]
  )
  
