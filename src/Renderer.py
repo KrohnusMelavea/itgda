@@ -62,37 +62,32 @@ class Renderer:
   this.camera_uniform_buffer = glGenBuffers(1)
   glBindBufferBase(GL_UNIFORM_BUFFER, this.camera_uniform_index, this.camera_uniform_buffer)
 
-  colours_data = this.models["cube"].get_colours()
+  colour_offset = 0
+  this.colours_offsets = dict()
+  for model_name, model in this.models.items():
+   this.colours_offsets[model_name] = colour_offset
+   colour_offset += len(model.colours)
+  colours_data = numpy.concatenate([this.models[model].get_colours() for model in this.models])
+  #colours_data = this.models["cube"].get_colours()
   this.colours_buffer = glGenBuffers(1)
   glBindBuffer(GL_SHADER_STORAGE_BUFFER, this.colours_buffer)
   glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, this.colours_buffer)
-  glNamedBufferData(this.colours_buffer, colours_data.nbytes, None, GL_DYNAMIC_DRAW)
-  mapped_colours_buffer = glMapNamedBufferRange(
+  glNamedBufferData(this.colours_buffer, colours_data.nbytes, None, GL_DYNAMIC_COPY)
+  this.mmapped_colours_buffer = glMapNamedBufferRange(
    this.colours_buffer,
    0,
    colours_data.nbytes,
-   GL_MAP_WRITE_BIT
+   GL_MAP_READ_BIT | GL_MAP_WRITE_BIT
   )
-  this.mapped_colours_buffer = (GLfloat * (colours_data.nbytes // 4)).from_address(mapped_colours_buffer)
+  this.mapped_colours_buffer = (GLfloat * (colours_data.nbytes // 4)).from_address(this.mmapped_colours_buffer)
+  ctypes.memmove(this.mapped_colours_buffer, colours_data.ctypes.data, colours_data.nbytes)
   glUnmapNamedBuffer(this.colours_buffer)
-  glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT)
+  #glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT)
 
-
-
-  # this.colours_buffer = glGenBuffers(1)
-  # glBindBuffer(GL_SHADER_STORAGE_BUFFER, this.colours_buffer)
-  # # glNamedBufferStorage(
-  # #  this.colours_buffer, 
-  # #  colours_data.nbytes,
-  # #  colours_data,
-  # #  GL_MAP_WRITE_BIT | GL_DYNAMIC_STORAGE_BIT 
-  # # )
-  # a = glMapBuffer(GL_SHADER_STORAGE_BUFFER, GL_WRITE_ONLY)
-  # this.mapped_colours_buffer = (GLfloat * colours_data.nbytes / 4).from_address(a)
-  # ctypes.memmove(this.mapped_colours_buffer, colours_data, colours_data.size)
-  # glUnmapBuffer(a)
-  # #glBufferData(GL_SHADER_STORAGE_BUFFER, colours_data.nbytes, colours_data, GL_STATIC_DRAW)
-  # glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, this.colours_buffer)
+  # this.fragment_uniform_data_index = glGetUniformBlockIndex(this.shader_sets[this.active_shader_set].program, "UniformData")
+  # print(this.fragment_uniform_data_index)
+  # this.fragment_uniform_data = glGenBuffers(1)
+  # glBindBufferBase(GL_UNIFORM_BUFFER, this.fragment_uniform_data_index, this.fragment_uniform_data)
 
  def destroy(this):
   glDeleteBuffers(this.camera_uniform_buffer)
@@ -124,9 +119,18 @@ class Renderer:
    this.draw_entities(model_name, mapped_entities[model_name])
 
  def draw_entities(this, model_name: str, entities: list[Entity]):
-  colours_data = this.models[model_name].get_colours()
-  ctypes.memmove(this.mapped_colours_buffer, colours_data.ctypes.data, colours_data.nbytes)
+  #glBindBuffer(GL_SHADER_STORAGE_BUFFER, this.colours_buffer)
+  #glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, this.colours_buffer)
+  #colours_data = this.models["cube"].get_colours()
+  #colours_data = this.models["cube"].get_colours()
+  #sglFlushMappedNamedBufferRange(this.colours_buffer, 0, colours_data.nbytes)
+  #glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0)
+
+  #uniform_data = numpy.array([this.colours_offsets[model_name]], dtype=numpy.int32)
+  #glNamedBufferData(this.camera_uniform_buffer, uniform_data.nbytes, uniform_data, GL_DYNAMIC_DRAW)
   
+  glUniform1i(glGetUniformLocation(this.shader_sets[this.active_shader_set].program, "colours_offset"), this.colours_offsets[model_name])
+
   transformation_data = numpy.array([list(entity.translation.get_coordinates()) + list(entity.rotation.get_coordinates()) + list(entity.scale.get_coordinates()) for entity in entities], dtype=numpy.float32)
   transformation_buffer = vbo.VBO(data=transformation_data, usage=GL_STATIC_DRAW, target=GL_ARRAY_BUFFER)
   
@@ -148,6 +152,8 @@ class Renderer:
   
   glDrawElementsInstanced(GL_TRIANGLES, 12*6, GL_UNSIGNED_INT, this.models[model_name].index_buffer, len(entities))
   
+  glFlush()
+
   this.models[model_name].index_buffer.unbind()
   this.models[model_name].vertex_buffer.unbind()
   transformation_buffer.unbind()
