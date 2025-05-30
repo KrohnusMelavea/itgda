@@ -2,8 +2,10 @@
 - OS: Windows 11
 - Arch: Intel x86
 - Py: Python 3.13 (system install)
+- OpenGL: 4.3+
 
 # MODULE DEPENDENCIES
+- pyrr
 - numpy
 - pygame
 - pyopengl

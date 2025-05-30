@@ -13,10 +13,10 @@ layout (location = 3) in vec3 instance_scale;
 
 mat4 translation_matrix(const vec3 v) {
 	return mat4(
-		1.0f, 0.0f, 0.0f, v.x,
-		0.0f, 1.0f, 0.0f, v.y,
-		0.0f, 0.0f, 1.0f, v.z,
-		0.0f, 0.0f, 0.0f, 1.0f
+		1.0f, 0.0f, 0.0f, 0,
+		0.0f, 1.0f, 0.0f, 0,
+		0.0f, 0.0f, 1.0f, 0,
+		v.x, v.y, v.z, 1.0f
 	);
 }
 mat4 scale_matrix(const vec3 v) {

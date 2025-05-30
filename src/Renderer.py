@@ -61,10 +61,15 @@ class Renderer:
   this.camera_uniform_buffer = glGenBuffers(1)
   glBindBufferBase(GL_UNIFORM_BUFFER, this.camera_uniform_index, this.camera_uniform_buffer)
 
-  # this.colours_buffer = glGenBuffers(1)
-  # glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, this.colours_buffer)
+  colours_data = numpy.ndarray([1, 1, 1], dtype=numpy.float32)
+  this.colours_buffer = glGenBuffers(1)
+  #glBindBuffer(GL_SHADER_STORAGE_BUFFER, this.colours_buffer)
+  glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 3, this.colours_buffer)
+  glBufferData(GL_SHADER_STORAGE_BUFFER, colours_data.nbytes, colours_data, GL_DYNAMIC_DRAW)
 
- 
+ def destroy(this):
+  glDeleteBuffers(this.camera_uniform_buffer)
+  
  def draw(this, camera: Camera):
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
 
@@ -91,30 +96,31 @@ class Renderer:
   for model_name in mapped_entities:
    this.draw_entities(model_name, mapped_entities[model_name])
 
- def drawText(this, x, y, text):
-  font = pygame.font.SysFont("couriernew", 20)                                                
-  textSurface = font.render(text, True, (255, 255, 255), (0, 66, 0, 255))
-  textData = pygame.image.tostring(textSurface, "RGBA", True)
-  glWindowPos2d(x, y)
-  glDrawPixels(textSurface.get_width(), textSurface.get_height(), GL_RGBA, GL_UNSIGNED_BYTE, textData)
-
  def draw_entities(this, model_name: str, entities: list[Entity]):
-  transformation_data = numpy.array([[0, 0, -5] + [0, 0, 0] + [0, 0, 0] for entity in entities], dtype='f')
-  transformation_buffer = vbo.VBO(data=transformation_data, usage=GL_DYNAMIC_DRAW, target=GL_ARRAY_BUFFER)
-  #GL_DYNAMIC_STORAGE_BIT
-  # colours_data = numpy.array(this.models[model_name].get_colours(), dtype='f')
-  # glNamedBuferData(this.colours_buffer, colour_data.nbytes, colour_data, GL_DYNAMIC_STORAGE_BIT)
+  glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 3, this.colours_buffer)
+  
+  transformation_data = numpy.array([list(entity.translation.get_coordinates()) + list(entity.rotation.get_coordinates()) + list(entity.scale.get_coordinates()) for entity in entities], dtype=numpy.float32)
+  transformation_buffer = vbo.VBO(data=transformation_data, usage=GL_STATIC_DRAW, target=GL_ARRAY_BUFFER)
   
   this.models[model_name].index_buffer.bind()
   glEnableVertexAttribArray(0)
   glEnableVertexAttribArray(1)
+  glEnableVertexAttribArray(2)
+  glEnableVertexAttribArray(3)
   this.models[model_name].vertex_buffer.bind()
   glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 12, None)
   transformation_buffer.bind()
   glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 36, ctypes.c_void_p(0))
-  glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 36, ctypes.c_void_p(12))
-  glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 36, ctypes.c_void_p(24))
+  glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 36, ctypes.c_void_p(12))
+  glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, 36, ctypes.c_void_p(24))
+  
   glVertexAttribDivisor(1, 1)
+  glVertexAttribDivisor(2, 1)
+  glVertexAttribDivisor(3, 1)
   
   glDrawElementsInstanced(GL_TRIANGLES, 12*6, GL_UNSIGNED_INT, this.models[model_name].index_buffer, len(entities))
+  
+  this.models[model_name].index_buffer.unbind()
+  this.models[model_name].vertex_buffer.unbind()
+  transformation_buffer.unbind()
  

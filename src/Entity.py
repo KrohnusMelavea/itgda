@@ -1,9 +1,14 @@
 from Vertex3D import Vertex3D
 
 class Entity:
- position: Vertex3D
+ translation: Vertex3D
+ rotation: Vertex3D
+ scale: Vertex3D
+ 
  model_name: str
  
- def __init__(this, position: Vertex3D, model_name: str):
-  this.position = position
+ def __init__(this, translation: Vertex3D, model_name: str):
+  this.translation = translation
+  this.rotation = Vertex3D(0, 0, 0)
+  this.scale = Vertex3D(2, 1, 1)
   this.model_name = model_name

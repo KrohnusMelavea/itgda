@@ -35,7 +35,6 @@ def main():
  movement_speed = 0.005
  rotation_speed = 0.001
  
- font = pygame.font.SysFont("couriernew", 20)
  running = True
  while True:
   for event in pygame.event.get():
@@ -70,13 +69,7 @@ def main():
    camera.position.y -= movement_speed
    
   renderer.draw(camera)
-
-  renderer.drawText(0, 0, "[ESC] to Quit")
-  
-  #window.blit(font.render("[ESC] to Quit", 1, (255, 255, 255)), (0, 0))
   pygame.display.flip()
-
-  time.sleep(0.01)
   
  pygame.display.quit()
  pygame.quit()
