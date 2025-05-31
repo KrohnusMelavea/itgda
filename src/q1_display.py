@@ -34,7 +34,7 @@ def main():
  )
  
  keyboard_state = KeyboardState()
- camera = Camera(position=Vertex3D(0, 0, 10), rotation = Vertex3D(0, 0, 0))
+ camera = Camera(position=Vertex3D(0, 0, -10), rotation = Vertex3D(0, 0, 0))
  movement_speed = 0.008
  rotation_speed = 0.002
  
@@ -63,19 +63,30 @@ def main():
   if keyboard_state.e:
    camera.rotation.z -= rotation_speed
   if keyboard_state.w:
-   camera.position += quaternion_rotate_3d(Vertex3D(0, 0, -movement_speed), camera.rotation)
+   camera.position += quaternion_rotate_3d(Vertex3D(0, 0, 1), camera.rotation) * Vertex3D(movement_speed, movement_speed, movement_speed)
   if keyboard_state.a:
-   camera.position += quaternion_rotate_3d(Vertex3D(-movement_speed, 0, 0), camera.rotation)
-  if keyboard_state.s:
-   camera.position += quaternion_rotate_3d(Vertex3D(0, 0, movement_speed), camera.rotation)
-  if keyboard_state.d:
    camera.position += quaternion_rotate_3d(Vertex3D(movement_speed, 0, 0), camera.rotation)
+  if keyboard_state.s:
+   camera.position += quaternion_rotate_3d(Vertex3D(0, 0, -movement_speed), camera.rotation)
+  if keyboard_state.d:
+   camera.position += quaternion_rotate_3d(Vertex3D(-movement_speed, 0, 0), camera.rotation)
   if keyboard_state.space:
-   camera.position += quaternion_rotate_3d(Vertex3D(0, movement_speed, 0), camera.rotation)
-  if keyboard_state.shift:
    camera.position += quaternion_rotate_3d(Vertex3D(0, -movement_speed, 0), camera.rotation)
+  if keyboard_state.shift:
+   camera.position += quaternion_rotate_3d(Vertex3D(0, movement_speed, 0), camera.rotation)
+  if keyboard_state.k1:
+   camera.global_scale.x += 0.001
+  if keyboard_state.k2:
+   camera.global_scale.x -= 0.001
+  if keyboard_state.k3:
+   camera.global_scale.y += 0.001
+  if keyboard_state.k4:
+   camera.global_scale.y -= 0.001
+  if keyboard_state.k5:
+   camera.global_scale.z += 0.001
+  if keyboard_state.k6:
+   camera.global_scale.z -= 0.001
 
-   
   renderer.draw(camera)
   pygame.display.flip()
   

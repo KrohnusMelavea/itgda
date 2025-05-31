@@ -47,6 +47,5 @@ To install dependencies, run "python -m pip install --upgrade <dependency_name>"
     - -:
   - Z:
     - +:
-    - -:
+    - -: f
 Note: Translation is not relative to (0, 1, 0), but to the current rotation.
-

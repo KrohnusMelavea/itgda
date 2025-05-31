@@ -1,7 +1,9 @@
 #version 430
 
 layout (binding = 0) uniform UBO {
- mat4 view;
+ vec4 translation;
+ vec4 rotation;
+ vec4 global_scale;
  mat4 projection;
 } camera;
 
@@ -46,12 +48,22 @@ vec4 quaternion_rotate_3d(const vec4 V, const vec3 A) {
 }
 
 void main() {
- gl_Position = 
-  camera.projection * 
-  camera.view * 
+ const vec4 object_transformation = 
   translation_matrix(instance_translation) * 
   quaternion_rotate_3d(
    scale_matrix(instance_scale) * vec4(vertex_position, 1.0), 
    instance_rotation
+  );
+
+// const vec4 camera_rotation = vec4(0, 2.9, 0, 1.0);
+// const vec4 camera_translation = vec4(0, 0, -10, 1.0);
+
+ gl_Position = 
+  camera.projection * 
+  quaternion_rotate_3d(
+   translation_matrix(camera.translation.xyz) *
+    scale_matrix(camera.global_scale.xyz) * 
+    object_transformation,
+   camera.rotation.xyz
   );
 }

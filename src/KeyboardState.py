@@ -13,6 +13,12 @@ class KeyboardState:
  l_arrow: bool
  q: bool
  e: bool
+ k1: bool
+ k2: bool
+ k3: bool
+ k4: bool
+ k5: bool
+ k6: bool
  
  def __init__(this):
   state = pygame.key.get_pressed()
@@ -28,6 +34,12 @@ class KeyboardState:
   this.l_arrow = state[pygame.K_LEFT]
   this.q = state[pygame.K_q]
   this.e = state[pygame.K_e]
+  this.k1 = state[pygame.K_1]
+  this.k2 = state[pygame.K_2]
+  this.k3 = state[pygame.K_3]
+  this.k4 = state[pygame.K_4]
+  this.k5 = state[pygame.K_5]
+  this.k6 = state[pygame.K_6]
  
  def update(this, event_type: int, event_key: int):
   match event_type:
@@ -59,6 +71,18 @@ class KeyboardState:
       this.q = False
      case pygame.K_e:
       this.e = False
+     case pygame.K_1:
+      this.k1 = False
+     case pygame.K_2:
+      this.k2 = False
+     case pygame.K_3:
+      this.k3 = False
+     case pygame.K_4:
+      this.k4 = False
+     case pygame.K_5:
+      this.k5 = False
+     case pygame.K_6:
+      this.k6 = False
    case pygame.KEYDOWN:
     match event_key:
      case pygame.K_w:
@@ -87,3 +111,15 @@ class KeyboardState:
       this.q = True
      case pygame.K_e:
       this.e = True
+     case pygame.K_1:
+      this.k1 = True
+     case pygame.K_2:
+      this.k2 = True
+     case pygame.K_3:
+      this.k3 = True
+     case pygame.K_4:
+      this.k4 = True
+     case pygame.K_5:
+      this.k5 = True
+     case pygame.K_6:
+      this.k6 = True

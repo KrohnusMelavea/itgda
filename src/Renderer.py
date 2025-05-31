@@ -3,6 +3,7 @@ from Model import Model
 from ShaderSet import ShaderSet
 from Camera import Camera
 from Vertex3D import Vertex3D
+from Vertex4D import Vertex4D
 from Entity import Entity
 from OpenGL.GL import (
  glClear,
@@ -31,6 +32,22 @@ import pyrr
 import pygame
 import math
 import time
+
+def quaternion_rotate(angle: float, axis: Vertex3D):
+ f = 1 / math.sqrt(axis.x*axis.x+axis.y*axis.y+axis.z*axis.z)
+ return Vertex4D(
+  f * axis.x * math.sin(angle/2), 
+  f * axis.y * math.sin(angle/2), 
+  f * axis.z * math.sin(angle/2),
+  math.cos(angle/2)
+ )
+def quaternion_multiply(lhs: Vertex4D, rhs: Vertex4D):
+ return Vertex4D(
+  lhs.w * rhs.x + lhs.x * rhs.w + lhs.y * rhs.z - lhs.z * rhs.y,
+  lhs.w * rhs.y - lhs.x * rhs.z + lhs.y * rhs.w + lhs.z * rhs.x,
+  lhs.w * rhs.z + lhs.x * rhs.y - lhs.z * rhs.x + lhs.z * rhs.w,
+  lhs.w * rhs.w - lhs.x * rhs.x - lhs.y * rhs.y - lhs.z * rhs.z,
+ )
 
 class Renderer:
  models: dict[str, Model]
@@ -88,17 +105,13 @@ class Renderer:
  def draw(this, camera: Camera):
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
 
-  rotation_offset = quaternion_rotate_3d(Vertex3D(0, 0, -1), camera.rotation)
-  camera_view = pyrr.matrix44.create_look_at(
-   camera.position.get_coordinates(), 
-   (
-    camera.position.x + rotation_offset.x,
-    camera.position.y + rotation_offset.y,
-    camera.position.z + rotation_offset.z
-   ), 
-   (0, 1, 0), dtype='f')
   camera_projection = pyrr.matrix44.create_perspective_projection(75.0, 800 / 600, 0.1, 75.0, dtype='f')
-  camera_data = numpy.concatenate((camera_view, camera_projection))
+  camera_data = numpy.concatenate((
+   numpy.array(list(camera.position.get_coordinates()) + [1], dtype=numpy.float32),
+   numpy.array(list(camera.rotation.get_coordinates()) + [1], dtype=numpy.float32),
+   numpy.array(list(camera.global_scale.get_coordinates()) + [1], dtype=numpy.float32),
+   camera_projection.flatten()
+  ))
   glNamedBufferData(this.camera_uniform_buffer, camera_data.nbytes, camera_data, GL_DYNAMIC_DRAW)
   
   mapped_entities: dict[str, list[Entity]] = dict()
