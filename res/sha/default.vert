@@ -1,22 +1,19 @@
 #version 430
 
 layout (binding = 0) uniform UBO {
- vec4 translation;
- vec4 rotation;
- vec4 global_scale;
+ vec4 translation;  /* Question 2: Camera-Based Translation */
+ vec4 rotation;     /* Question 3: Camera-Based Rotation    */
+ vec4 global_scale; /* Question 4" Global Scalings */
  mat4 projection;
 } camera;
 
-//layout (binding = 1) buffer PrimitiveData {
-// vec4 colours[];
-//} primitive_data;
+layout (location = 0) in vec3 vertex_position; /* Question 1: Vertex Data */
 
-layout (location = 0) in vec3 vertex_position;
+layout (location = 1) in vec3 instance_translation; /* Question 2: Instance-Based Translation */
+layout (location = 2) in vec3 instance_rotation;    /* Question 3: Instance-Based Rotation    */
+layout (location = 3) in vec3 instance_scale;       /* Question 4: Instance-Based Scaling     */
 
-layout (location = 1) in vec3 instance_translation;
-layout (location = 2) in vec3 instance_rotation;
-layout (location = 3) in vec3 instance_scale;
-
+/* Question 2: Translation */
 mat4 translation_matrix(const vec3 v) {
 	return mat4(
 		1.0f, 0.0f, 0.0f, 0,
@@ -25,6 +22,7 @@ mat4 translation_matrix(const vec3 v) {
 		v.x, v.y, v.z, 1.0f
 	);
 }
+/* Question 4: Scaling */
 mat4 scale_matrix(const vec3 v) {
 	return mat4(
 		v.x, 0.0, 0.0, 0.0,
@@ -34,7 +32,12 @@ mat4 scale_matrix(const vec3 v) {
 	);
 }
 
-//For all relevant mathematical proofs relating to the following, refer to the paper I wrote at https://github.com/KrohnusMelavea/math-papers titled "Quaternions for Spacial Manipulation - Daniel de Waal"
+/* 
+Question 3: Rotation
+For all relevant mathematical proofs relating to the following, 
+refer to the paper I wrote at https://github.com/KrohnusMelavea/math-papers,
+titled "Quaternions for Spacial Manipulation - Daniel de Waal" 
+*/
 vec4 quaternion_rotate_3d(const vec4 V, const vec3 A) {
 	const float cx = cos(A.x), cy = cos(A.y), cz = cos(A.z);
 	const float sx = sin(A.x), sy = sin(A.y), sz = sin(A.z);
@@ -49,21 +52,25 @@ vec4 quaternion_rotate_3d(const vec4 V, const vec3 A) {
 
 void main() {
  const vec4 object_transformation = 
-  translation_matrix(instance_translation) * 
+  /* Question 2: Instance-Based Translation */
+  translation_matrix(instance_translation) *
+  /* Question 3: Instance-based Rotation */
   quaternion_rotate_3d(
-   scale_matrix(instance_scale) * vec4(vertex_position, 1.0), 
+   /* Question 4: Instance-Based Scaling */
+   scale_matrix(instance_scale) * 
+   vec4(vertex_position, 1.0), 
    instance_rotation
   );
 
-// const vec4 camera_rotation = vec4(0, 2.9, 0, 1.0);
-// const vec4 camera_translation = vec4(0, 0, -10, 1.0);
-
  gl_Position = 
   camera.projection * 
+  /* Question 3: Camera-Based Rotation */
   quaternion_rotate_3d(
+   /* Question 2: Camera-Based Translation */
    translation_matrix(camera.translation.xyz) *
-    scale_matrix(camera.global_scale.xyz) * 
-    object_transformation,
+   /* Question 4: Global Scaling */
+   scale_matrix(camera.global_scale.xyz) * 
+   object_transformation,
    camera.rotation.xyz
   );
 }

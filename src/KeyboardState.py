@@ -1,18 +1,21 @@
 import pygame
 
 class KeyboardState:
+ # Question 2: Instance-Based Translation
  w: bool
  a: bool
  s: bool
  d: bool
  space: bool
  shift: bool
+ # Question 3: Instance-Based Rotation 
  u_arrow: bool
  r_arrow: bool
  d_arrow: bool
  l_arrow: bool
  q: bool
  e: bool
+ # Question 4: Instance-Based Scaling
  k1: bool
  k2: bool
  k3: bool
@@ -22,18 +25,21 @@ class KeyboardState:
  
  def __init__(this):
   state = pygame.key.get_pressed()
+  # Question 2: Instance-Based Translation
   this.w = state[pygame.K_w]
   this.a = state[pygame.K_a]
   this.s = state[pygame.K_s]
   this.d = state[pygame.K_d]
   this.space = state[pygame.K_SPACE]
   this.shift = state[pygame.K_LSHIFT] or state[pygame.K_RSHIFT]
+  # Question 3: Instance-Based Rotation
   this.u_arrow = state[pygame.K_UP]
   this.r_arrow = state[pygame.K_RIGHT]
   this.d_arrow = state[pygame.K_DOWN]
   this.l_arrow = state[pygame.K_LEFT]
   this.q = state[pygame.K_q]
   this.e = state[pygame.K_e]
+  # Question 4: Instance-Based Scaling
   this.k1 = state[pygame.K_1]
   this.k2 = state[pygame.K_2]
   this.k3 = state[pygame.K_3]
@@ -45,6 +51,7 @@ class KeyboardState:
   match event_type:
    case pygame.KEYUP:
     match event_key:
+     # Question 2: Instance-Based Translation
      case pygame.K_w:
       this.w = False
      case pygame.K_a:
@@ -59,6 +66,7 @@ class KeyboardState:
       this.shift = False
      case pygame.K_RSHIFT:
       this.shift = False
+     # Question 3: Instance-Based Rotation
      case pygame.K_UP:
       this.u_arrow = False
      case pygame.K_RIGHT:
@@ -71,6 +79,7 @@ class KeyboardState:
       this.q = False
      case pygame.K_e:
       this.e = False
+     # Question 4: Instance-Based Scaling
      case pygame.K_1:
       this.k1 = False
      case pygame.K_2:
@@ -85,6 +94,7 @@ class KeyboardState:
       this.k6 = False
    case pygame.KEYDOWN:
     match event_key:
+     # Question 2: Instance-Based Translation 
      case pygame.K_w:
       this.w = True
      case pygame.K_a:
@@ -99,6 +109,7 @@ class KeyboardState:
       this.shift = True
      case pygame.K_RSHIFT:
       this.shift = True
+     # Question 3: Instance-Based Rotation
      case pygame.K_UP:
       this.u_arrow = True
      case pygame.K_RIGHT:
@@ -111,6 +122,7 @@ class KeyboardState:
       this.q = True
      case pygame.K_e:
       this.e = True
+     # Question 4: Instance-Based Scaling
      case pygame.K_1:
       this.k1 = True
      case pygame.K_2:

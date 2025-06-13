@@ -20,9 +20,9 @@ class Model:
   this.indices = indices
   this.colours = colours
   
-  this.build_vertex_buffer()
-  this.build_index_buffer()
-  this.build_colour_buffer()
+  this.build_vertex_buffer() # Question 1: Initial Rendering
+  this.build_index_buffer()  # Question 1: Initial Rendering
+  this.build_colour_buffer() # Question 5: Primitive-Based Colouring 
   
  def get_vertices(this):
   return numpy.array(

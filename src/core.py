@@ -17,6 +17,7 @@ def read_models(file_path: str) -> dict[str, Model]:
   for name, model in data.items()
  )
  
+""" Question 3: Rotation """
 def quaternion_rotate_3d(V: Vertex3D, A: Vertex3D) -> Vertex3D:
  cx = math.cos(A.x)
  cy = math.cos(A.y)
